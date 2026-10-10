@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Марсианская перепись: кто ты в кибердеревне?</title>
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+<main id="app">
+
+  <section class="screen" id="screen-loading">
+    <div class="loading"><span class="spinner" aria-hidden="true"></span><p>Связь с Марсом…</p></div>
+  </section>
+
+  <!-- Prologue -->
+  <section class="screen" id="screen-story" hidden>
+    <div class="shake-target"><div class="stage"><div class="scene"></div></div></div>
+    <p class="tap-hint" hidden></p>
+    <div class="text-frame" role="region" aria-live="polite">
+      <h2 class="frame-title"></h2>
+      <p class="frame-text"></p>
+    </div>
+  </section>
+
+  <!-- Interactive scene -->
+  <section class="screen" id="screen-scene" hidden>
+    <header class="hud">
+      <div class="hud-title"></div>
+      <div class="hud-timer digits" aria-label="Осталось секунд">0:45</div>
+    </header>
+    <div class="play-area">
+      <aside class="backpack" aria-label="Рюкзак">
+        <h3 class="backpack-title">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M9 2h6l1 2h1a3 3 0 0 1 3 3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a3 3 0 0 1 3-3h1l1-2Zm.6 2-.2.4h5.2l-.2-.4H9.6ZM7 6a1 1 0 0 0-1 1v2h12V7a1 1 0 0 0-1-1H7Zm-1 5v9h12v-9H6Zm3 2h6v3H9v-3Z"/></svg>
+          <span>Рюкзак <i>//</i> Инвентарь</span>
+        </h3>
+        <div class="slots"></div>
+        <p class="pick-counter"><span class="digits">0</span> / <span class="digits">3</span></p>
+        <button class="btn done-btn" type="button" disabled>Готово</button>
+      </aside>
+      <div class="stage-wrap">
+        <div class="stage"><div class="scene"></div></div>
+        <p class="tap-hint scene-hint off">В рюкзак влезает 3 предмета. Бери только то, чем сам решил бы эту ситуацию.</p>
+        <div class="overlay intro-overlay" hidden>
+          <div class="text-frame card">
+            <h2 class="intro-title"></h2>
+            <p class="intro-text"></p>
+            <p class="intro-rule">В рюкзак влезает не больше 3 предметов. Бери только те, которыми сам решил бы эту ситуацию.</p>
+            <button class="btn" type="button">К делу!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="edit-bar" hidden>
+      <label for="edit-out">Места предметов (вставь в tools/build_game_assets.py, SPOTS):</label>
+      <textarea id="edit-out" readonly rows="2"></textarea>
+    </div>
+  </section>
+
+  <!-- Cutscene -->
+  <section class="screen" id="screen-cutscene" hidden>
+    <div class="cut-bg"></div>
+    <div class="cut-top"><div class="cut-picks" aria-label="Что ты выбрал"></div></div>
+    <div class="text-frame">
+      <p class="cut-took" hidden></p>
+      <p class="frame-text"></p>
+      <button class="btn next-btn" type="button" hidden>Дальше</button>
+    </div>
+  </section>
+
+  <!-- Final -->
+  <section class="screen" id="screen-final" hidden>
+    <video class="goose-video" playsinline loop preload="auto" hidden></video>
+    <div class="final-card">
+      <p class="final-headline"></p>
+      <img class="final-badge" width="200" height="200" alt="" hidden>
+      <h2 class="final-title"></h2>
+      <p class="final-text"></p>
+      <p class="goose-caption" hidden></p>
+      <button class="btn retry-btn" type="button" hidden>Попробовать снова</button>
+      <form class="passport-form" autocomplete="off" hidden>
+        <label for="player-name">Как тебя записать в марсианский реестр?</label>
+        <input id="player-name" type="text" maxlength="24" placeholder="Твоё имя" enterkeyhint="done">
+        <button class="btn" type="submit" disabled>Получить паспорт</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Sandbox -->
+  <section class="screen" id="screen-sandbox" hidden>
+    <header class="hud">
+      <span class="hud-count"></span>
+      <span class="hud-time digits" aria-label="Время">0:00</span>
+    </header>
+    <p class="banner" hidden></p>
+    <div class="stage-wrap">
+      <div class="stage"><div class="scene"></div></div>
+      <p class="tap-hint"></p>
+      <div class="goose-heckle" aria-live="polite"><img src="assets/sandbox/goose_heckler.webp" alt=""><p><span></span></p></div>
+      <aside class="side-panel" aria-live="polite" aria-hidden="true">
+        <div class="text-frame">
+          <span class="modal-count"></span>
+          <h2 class="modal-title"></h2>
+          <p class="modal-text"></p>
+          <button class="btn" type="button">Круто</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Leaderboard -->
+  <section class="screen" id="screen-leaderboard" hidden>
+    <div class="final-card">
+      <h2 class="lb-title">Марсианский реестр: ТОП-10</h2>
+      <p class="lb-status" role="status"></p>
+      <table class="lb-table">
+        <thead><tr><th scope="col">#</th><th scope="col"><span class="sr-only">Архетип</span></th><th scope="col">Имя</th><th scope="col">Время</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="lb-outro"></p>
+      <p class="lb-note"></p>
+    </div>
+  </section>
+
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/data/story-data.js"></script>
+<script src="js/data/layout-data.js"></script>
+<script src="js/data/sandbox-scene-data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/stage.js"></script>
+<script src="js/leaderboard.js"></script>
+<script src="js/screens/story-screen.js"></script>
+<script src="js/screens/scene-screen.js"></script>
+<script src="js/screens/cutscene-screen.js"></script>
+<script src="js/screens/final-screen.js"></script>
+<script src="js/screens/sandbox-screen.js"></script>
+<script src="js/screens/leaderboard-screen.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

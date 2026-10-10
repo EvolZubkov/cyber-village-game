@@ -1,0 +1,9 @@
+{
+  "name": "mars-census-game",
+  "private": true,
+  "description": "Mini-game «Марсианская перепись»: static site, open index.html",
+  "scripts": {
+    "test": "node --test tests/engine.test.js tests/engine.exhaustive.test.js",
+    "build:assets": "python ../tools/build_game_assets.py && python ../tools/build_sandbox_assets.py game"
+  }
+}
