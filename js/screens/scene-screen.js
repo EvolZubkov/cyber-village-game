@@ -13,6 +13,7 @@ MG.screens = MG.screens || {};
   var TIMER_TICK_MS = 100;
   var FLY_MS = 450;
   var HURRY_MS = 10000;
+  var ITEM_TOP_ROOM = 12; // percent of the picture height kept above the highest item place
   var HINT_MS = 8000; // how long the "take 3 items" hint stays on screen
 
   var stage = null;
@@ -255,7 +256,9 @@ MG.screens = MG.screens || {};
         btn.classList.toggle("label-up", places[index].y > 80);
       });
       if (stage) stage.destroy();
-      stage = MG.createStage(viewport, scene, look.aspect, { locked: true });
+      // The top of the picture may be cropped only above the highest item place (minus room for its size).
+      var highest = Math.min.apply(null, allSpots.map(function (spot) { return spot[1]; }));
+      stage = MG.createStage(viewport, scene, look.aspect, { locked: true, safeCrop: (highest - ITEM_TOP_ROOM) / 100 });
       stage.reset();
       if (stopWatching) stopWatching();
       stopWatching = editMode ? null : MG.ui.watchVariant(look.portrait, applyLook);

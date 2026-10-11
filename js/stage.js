@@ -20,7 +20,8 @@ window.MG = window.MG || {};
    * @param {HTMLElement} viewport scrolling container
    * @param {HTMLElement} scene element holding the picture and everything placed on it
    * @param {number} aspect picture width / height
-   * @param {{onGesture?: function}} [options]
+   * @param {{onGesture?: function, locked?: boolean|string, safeCrop?: number}} [options]
+   *   safeCrop: the share (0..0.5) of the picture height a locked stage may cut off at the top
    */
   function createStage(viewport, scene, aspect, options) {
     var opts = options || {};
@@ -80,24 +81,37 @@ window.MG = window.MG || {};
       disposers.push(function () { target.removeEventListener(type, handler, options2); });
     }
 
-    // Locked stage (prologue and scenes): the whole picture is shown, no pan and no zoom.
+    // Locked stage (prologue and scenes): no pan and no zoom. The picture fills the screen width when that
+    // hides no more than opts.safeCrop of its height (the top is cropped, the bottom stays); otherwise the whole
+    // picture is shown with the blurred backdrop at the sides.
     if (opts.locked) {
       viewport.classList.add("locked");
+      var maxHidden = typeof opts.safeCrop === "number" ? clamp(opts.safeCrop, 0, 0.5) : 1 - 1 / MAX_CROP_RATIO;
       var refit = function () {
-        // Fill the screen width; the picture's top is cropped a little when the screen is not wide enough.
-        // Very wide screens fall back to showing the whole picture.
+        if (!viewport.clientWidth || !viewport.clientHeight) return; // screen not shown yet: ResizeObserver calls again
         var widthZoom = viewport.clientWidth / coverWidth();
-        var cropOk = viewport.clientWidth / aspect <= viewport.clientHeight * MAX_CROP_RATIO;
-        zoom = opts.locked === "cover" ? 1 : (cropOk ? widthZoom : fitZoom());
+        var hidden = 1 - viewport.clientHeight / (viewport.clientWidth / aspect);
+        zoom = opts.locked === "cover" ? 1 : (hidden <= maxHidden ? widthZoom : fitZoom());
         scene.style.width = (coverWidth() * zoom) + "px";
-        viewport.style.alignItems = scene.offsetHeight > viewport.clientHeight ? "flex-end" : "center";
+        var spare = viewport.clientHeight - scene.offsetHeight;
+        viewport.style.alignItems = "flex-start";
+        scene.style.marginTop = (spare < 0 ? spare : spare / 2) + "px"; // cropped: bottom-aligned; otherwise centred
       };
       on(window, "resize", refit);
+      var observer = typeof ResizeObserver === "function" ? new ResizeObserver(refit) : null;
+      if (observer) observer.observe(viewport);
       return {
         reset: refit,
         focus: function () {},
         getZoom: function () { return zoom; },
-        destroy: function () { disposers.forEach(function (d) { d(); }); disposers = []; viewport.classList.remove("locked"); }
+        destroy: function () {
+          if (observer) observer.disconnect();
+          disposers.forEach(function (d) { d(); });
+          disposers = [];
+          viewport.classList.remove("locked");
+          viewport.style.alignItems = "";
+          scene.style.marginTop = "";
+        }
       };
     }
     viewport.classList.remove("locked");
