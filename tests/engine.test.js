@@ -137,3 +137,25 @@ test("phrase bag with a single phrase keeps returning it", () => {
   assert.equal(next(), "only");
   assert.equal(next(), "only");
 });
+
+test("bridge word is compared without case, spaces, punctuation and the e/yo difference", () => {
+  assert.equal(E.normalizeBridgeWord("  Изолента "), "ИЗОЛЕНТА");
+  assert.equal(E.normalizeBridgeWord("изол ё нта!"), "ИЗОЛЕНТА");
+  assert.equal(E.normalizeBridgeWord(null), "");
+  assert.equal(E.normalizeBridgeWord(42), "");
+});
+
+test("bridge word matches only its own hash", () => {
+  const hash = E.hashBridgeWord("ИЗОЛЕНТА");
+  assert.equal(typeof hash, "string");
+  assert.equal(E.bridgeWordMatches("изолента", hash), true);
+  assert.equal(E.bridgeWordMatches(" ИЗОЛЁНТА ", hash), true);
+  assert.equal(E.bridgeWordMatches("изолента2", hash), false);
+  assert.equal(E.bridgeWordMatches("", hash), false);
+  assert.equal(E.bridgeWordMatches("изолента", ""), false);
+  assert.equal(E.bridgeWordMatches(undefined, hash), false);
+});
+
+test("the hash stored in config.js stays the hash of the agreed word", () => {
+  assert.equal(E.hashBridgeWord("ИЗОЛЕНТА"), "12mxmo2ldul");
+});

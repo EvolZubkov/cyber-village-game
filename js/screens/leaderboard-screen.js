@@ -20,7 +20,14 @@ MG.screens = MG.screens || {};
     badge.height = 40;
     badgeCell.appendChild(badge);
     tr.appendChild(badgeCell);
-    tr.appendChild(MG.ui.el("td", "lb-name", entry.name)); // textContent: names come from other players
+    var nameCell = MG.ui.el("td", "lb-name", entry.name); // textContent: names come from other players
+    if (entry.bonus) {
+      var bonus = MG.ui.el("span", "lb-bonus", "🛠️");
+      bonus.title = MG.story.bridge.badgeTitle;
+      bonus.setAttribute("aria-label", MG.story.bridge.badgeTitle);
+      nameCell.appendChild(bonus);
+    }
+    tr.appendChild(nameCell);
     tr.appendChild(MG.ui.el("td", "lb-time", MG.engine.formatTime(entry.time)));
     return tr;
   }

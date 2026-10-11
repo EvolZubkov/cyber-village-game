@@ -109,6 +109,26 @@
     </div>
   </section>
 
+  <!-- Bridge to Skill'Ум -->
+  <section class="screen" id="screen-bridge" hidden>
+    <div class="bridge-bg" aria-hidden="true"></div>
+    <div class="bridge-flash" aria-hidden="true"></div>
+    <div class="text-frame bridge-plate" role="region" aria-live="polite">
+      <h2 class="bridge-title"></h2>
+      <div class="bridge-scroll">
+        <img class="bridge-avatar" width="72" height="72" alt="" hidden>
+        <p class="bridge-text"></p>
+        <p class="bridge-dispatcher" hidden></p>
+      </div>
+      <form class="bridge-code" autocomplete="off" hidden>
+        <label for="bridge-code">Кодовое слово с экрана терминала</label>
+        <input id="bridge-code" type="text" maxlength="32" autocapitalize="characters" spellcheck="false" enterkeyhint="done">
+        <p class="bridge-error" role="alert" hidden></p>
+      </form>
+      <div class="bridge-actions"></div>
+    </div>
+  </section>
+
   <!-- Leaderboard -->
   <section class="screen" id="screen-leaderboard" hidden>
     <div class="final-card">
@@ -138,6 +158,7 @@
 <script src="js/screens/cutscene-screen.js"></script>
 <script src="js/screens/final-screen.js"></script>
 <script src="js/screens/sandbox-screen.js"></script>
+<script src="js/screens/bridge-screen.js"></script>
 <script src="js/screens/leaderboard-screen.js"></script>
 <script src="js/main.js"></script>
 </body>

@@ -240,6 +240,37 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rust); outl
 .clue-ring { position: absolute; z-index: 90; aspect-ratio: 1; transform: translate(-50%, -50%); border: 4px solid var(--neon); border-radius: 50%; pointer-events: none; box-shadow: 0 0 18px var(--neon), inset 0 0 18px rgba(53, 232, 255, .6); animation: clue-pulse 1s ease-in-out infinite; }
 @keyframes clue-pulse { 0%, 100% { opacity: .35; transform: translate(-50%, -50%) scale(.85); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
 
+/* ---------- bridge to Skill'Ум: system failure, the archetype's request, code word ---------- */
+#screen-bridge { overflow: hidden; background: #050202; }
+.bridge-bg { position: absolute; inset: 0; background: url("../assets/sandbox/bg1.webp") center / cover no-repeat; filter: saturate(.6) brightness(.5) hue-rotate(-25deg); animation: bridge-jitter 2.6s steps(1) infinite; }
+.bridge-bg::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .35) 0 2px, transparent 2px 4px); }
+@keyframes bridge-jitter {
+  0%, 100% { transform: none; } 7% { transform: translate(-6px, 2px) skewX(-1.5deg); } 9% { transform: translate(5px, -3px); }
+  52% { transform: none; filter: saturate(.6) brightness(.8) hue-rotate(-25deg); } 54% { transform: translate(8px, 0) skewX(2deg); } 56% { transform: none; }
+}
+.bridge-flash { position: absolute; inset: 0; z-index: 4; background: #fff; opacity: 0; pointer-events: none; }
+.bridge-flash.on { animation: bridge-flash .9s ease-out; }
+@keyframes bridge-flash { from { opacity: .9; } to { opacity: 0; } }
+.bridge-plate { position: absolute; z-index: 3; left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); max-width: 760px; max-height: calc(100% - 28px); margin-inline: auto; display: flex; flex-direction: column; }
+.bridge-title { flex: none; margin: 0 0 8px; font: 15px/1.3 var(--font-display); letter-spacing: .05em; text-transform: uppercase; color: var(--rust); text-wrap: balance; }
+.bridge-plate.alert { border-color: var(--danger); }
+.bridge-plate.alert .bridge-title { text-transform: none; color: var(--danger); text-shadow: 1px 0 var(--neon), -1px 0 #ff2fd5; animation: bridge-text-glitch 1.8s steps(1) infinite; }
+@keyframes bridge-text-glitch { 0%, 100% { transform: none; } 12% { transform: translateX(-3px); } 14% { transform: translateX(3px); } 16% { transform: none; } }
+.bridge-plate.ok .bridge-title { color: var(--neon); }
+.bridge-scroll { min-height: 0; overflow: auto; overscroll-behavior: contain; padding-right: 4px; }
+.bridge-avatar { float: left; width: 72px; height: 72px; margin: 2px 12px 4px 0; border-radius: 50%; border: 3px solid var(--neon); box-shadow: 0 0 12px rgba(53, 232, 255, .5); background: #0a0505; }
+.bridge-text { margin: 0; font-size: 18px; line-height: 1.5; }
+.bridge-dispatcher { clear: both; margin: 12px 0 0; padding: 8px 10px; border-left: 3px solid var(--neon); color: var(--muted); font-size: 15px; line-height: 1.4; }
+.bridge-note { margin: 12px 0 0; font-size: 16px; }
+.bridge-link { margin: 6px 0 0; font-size: 14px; color: var(--neon); overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
+.bridge-code { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.bridge-code label { color: var(--muted); font-size: 15px; }
+.bridge-code input { padding: 10px 12px; font-size: 19px; text-transform: uppercase; background: #0a0505; border: 2px solid var(--rust-dark); border-radius: 0; }
+.bridge-error { margin: 0; color: var(--danger); font-size: 15px; }
+.bridge-actions { flex: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 14px; }
+a.btn { text-decoration: none; }
+.lb-bonus { margin-left: 6px; filter: sepia(1) saturate(4) hue-rotate(-10deg) brightness(1.2); }
+
 /* ---------- goose heckler in the Sandbox (every third miss) ---------- */
 .goose-heckle { --gw: min(56vw, 330px); position: absolute; left: 0; right: 0; bottom: 0; z-index: 45; display: flex; flex-direction: column; align-items: flex-start; pointer-events: none; transform: translateX(-110%); opacity: 0; transition: transform .45s cubic-bezier(.175, .885, .32, 1.275), opacity .25s ease; }
 .goose-heckle.show { transform: none; opacity: 1; }
@@ -304,6 +335,12 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rust); outl
   .lb-time { font-size: 16px; }
   .lb-badge { width: 32px; height: 32px; }
   .lb-outro { font-size: 14px; margin-top: 10px; }
+  .bridge-title { font-size: 12px; }
+  .bridge-text { font-size: 14px; line-height: 1.4; }
+  .bridge-dispatcher { font-size: 13px; margin-top: 8px; }
+  .bridge-note { font-size: 14px; }
+  .bridge-avatar { width: 48px; height: 48px; border-width: 2px; margin-right: 8px; }
+  .bridge-plate { max-height: calc(100% - 16px); bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
   /* the goose heckler is smaller */
   .goose-heckle { --gw: min(34vw, 150px); }
   .goose-heckle p { width: min(86vw, 520px); margin-left: 2vw; }
@@ -318,7 +355,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rust); outl
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cut-bg, .cut-bg.situation, .clue-ring, .takeoff-zoom, .hot-glow.on, .shake-animation, .hurry .hud-timer, .final-badge, .slot.filled, .spinner, .btn:hover::after { animation: none; }
+  .bridge-bg, .bridge-plate.alert .bridge-title, .bridge-flash.on, .cut-bg, .cut-bg.situation, .clue-ring, .takeoff-zoom, .hot-glow.on, .shake-animation, .hurry .hud-timer, .final-badge, .slot.filled, .spinner, .btn:hover::after { animation: none; }
   .hot-glow.on { opacity: .8; }
   .screen.enter { animation: none; }
   .map-item, .sb-item.egg, .side-panel { transition: none; }

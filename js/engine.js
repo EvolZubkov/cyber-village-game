@@ -67,6 +67,35 @@
     return raw.replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, MAX_NAME_LENGTH);
   }
 
+  /** The bridge code word as typed: upper case, "ё" as "е", only letters and digits. */
+  function normalizeBridgeWord(raw) {
+    if (typeof raw !== "string") return "";
+    return raw.toUpperCase().replace(/Ё/g, "Е").replace(/[^A-ZА-Я0-9]/g, "");
+  }
+
+  /**
+   * Short non-cryptographic hash (cyrb53) of the normalized word. The page is public, so this only keeps the
+   * word from being read at a glance in config.js; it does not protect anything.
+   */
+  function hashBridgeWord(raw) {
+    var text = normalizeBridgeWord(raw);
+    var h1 = 0xdeadbeef;
+    var h2 = 0x41c6ce57;
+    for (var i = 0; i < text.length; i++) {
+      var ch = text.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+  }
+
+  function bridgeWordMatches(input, hash) {
+    var text = normalizeBridgeWord(input);
+    return text !== "" && typeof hash === "string" && hash !== "" && hashBridgeWord(text) === hash;
+  }
+
   /**
    * Phrases in random order without repeats: every phrase is shown once before any comes again,
    * and the first phrase of a new round never equals the last one of the previous round.
@@ -97,7 +126,8 @@
   var api = {
     HEROES: HEROES, OUTCOMES: OUTCOMES, FINAL_KEYS: FINAL_KEYS, MAX_NAME_LENGTH: MAX_NAME_LENGTH,
     SCENES_TOTAL: SCENES_TOTAL, createState: createState, resolveOutcome: resolveOutcome,
-    applyOutcome: applyOutcome, determineFinal: determineFinal, formatTime: formatTime, cleanName: cleanName, createPhraseBag: createPhraseBag
+    applyOutcome: applyOutcome, determineFinal: determineFinal, formatTime: formatTime, cleanName: cleanName, createPhraseBag: createPhraseBag,
+    normalizeBridgeWord: normalizeBridgeWord, hashBridgeWord: hashBridgeWord, bridgeWordMatches: bridgeWordMatches
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

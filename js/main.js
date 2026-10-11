@@ -67,10 +67,30 @@
     patch({ sandboxTotalTime: timeMs });
     var entry = { name: state.playerName, archetype: state.finalArchetype, time: timeMs, timestamp: Date.now() };
     MG.ui.showScreen("loading");
-    MG.leaderboard.submit(entry, { localOnly: !!MG.ui.query().sandbox }).catch(function () { /* an invalid entry is simply not stored */ }).then(function () {
-      patch({ currentScene: "leaderboard" });
-      MG.screens.leaderboard.run({ entry: entry });
+    MG.leaderboard.submit(entry, { localOnly: !!MG.ui.query().sandbox }).catch(function () { /* an invalid entry is simply not stored */ return null; }).then(function (saved) {
+      if (!MG.config.skilumUrl) return showLeaderboard(entry);
+      showBridge(entry, saved);
     });
+  }
+
+  /** Bridge to Skill'Ум: a correct code word gives the saved result the repairman badge before the table opens. */
+  function showBridge(entry, saved) {
+    patch({ currentScene: "bridge" });
+    MG.screens.bridge.run({
+      name: entry.name, archetype: entry.archetype, url: MG.config.skilumUrl, wordHash: MG.config.bridgeWordHash,
+      onDone: function (result) {
+        if (!result.bonus) return showLeaderboard(entry);
+        MG.ui.showScreen("loading");
+        MG.leaderboard.markBonus(entry, saved).then(function (ok) {
+          showLeaderboard(ok ? Object.assign({}, entry, { bonus: true }) : entry);
+        });
+      }
+    });
+  }
+
+  function showLeaderboard(entry) {
+    patch({ currentScene: "leaderboard" });
+    MG.screens.leaderboard.run({ entry: entry });
   }
 
   function boot() {

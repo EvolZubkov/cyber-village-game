@@ -5,6 +5,7 @@ window.MG = window.MG || {};
 
   var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var TYPE_DELAY_MS = 16;
+  var PHONE_SHORT_SIDE_PX = 700;
 
   function el(tag, className, text) {
     var node = document.createElement(tag);
@@ -101,5 +102,13 @@ window.MG = window.MG || {};
     return function () { window.removeEventListener("resize", check); };
   }
 
-  MG.ui = { watchVariant: watchVariant, variant: variant, setBackdrop: setBackdrop, el: el, clear: clear, showScreen: showScreen, typewriter: typewriter, preload: preload, query: query, reducedMotion: reducedMotion };
+  /** A touch-screen phone (the Skill'Ум trainer does not run on one): coarse pointer and a short side under 700 px. */
+  function isPhone() {
+    var coarse = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+    var shortSide = Math.min(window.screen && window.screen.width || Infinity, window.screen && window.screen.height || Infinity,
+      window.innerWidth, window.innerHeight);
+    return coarse && shortSide < PHONE_SHORT_SIDE_PX;
+  }
+
+  MG.ui = { isPhone: isPhone, watchVariant: watchVariant, variant: variant, setBackdrop: setBackdrop, el: el, clear: clear, showScreen: showScreen, typewriter: typewriter, preload: preload, query: query, reducedMotion: reducedMotion };
 })(window.MG);
