@@ -22,9 +22,12 @@ MG.screens = MG.screens || {};
     tr.appendChild(badgeCell);
     var nameCell = MG.ui.el("td", "lb-name", entry.name); // textContent: names come from other players
     if (entry.bonus) {
-      var bonus = MG.ui.el("span", "lb-bonus", "🛠️");
+      var bonus = MG.ui.el("img", "lb-bonus");
+      bonus.src = "assets/badges/repairman.webp";
+      bonus.alt = MG.story.bridge.badgeTitle;
       bonus.title = MG.story.bridge.badgeTitle;
-      bonus.setAttribute("aria-label", MG.story.bridge.badgeTitle);
+      bonus.width = 22;
+      bonus.height = 22;
       nameCell.appendChild(bonus);
     }
     tr.appendChild(nameCell);

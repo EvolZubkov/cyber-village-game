@@ -76,15 +76,17 @@
   /** Bridge to Skill'Ум: a correct code word gives the saved result the repairman badge before the table opens. */
   function showBridge(entry, saved) {
     patch({ currentScene: "bridge" });
-    MG.screens.bridge.run({
-      name: entry.name, archetype: entry.archetype, url: MG.config.skilumUrl, wordHash: MG.config.bridgeWordHash,
-      onDone: function (result) {
-        if (!result.bonus) return showLeaderboard(entry);
-        MG.ui.showScreen("loading");
-        MG.leaderboard.markBonus(entry, saved).then(function (ok) {
-          showLeaderboard(ok ? Object.assign({}, entry, { bonus: true }) : entry);
-        });
-      }
+    afterLoading(MG.screens.bridge.preloadUrls(), function () {
+      MG.screens.bridge.run({
+        name: entry.name, archetype: entry.archetype, url: MG.config.skilumUrl, wordHash: MG.config.bridgeWordHash,
+        onDone: function (result) {
+          if (!result.bonus) return showLeaderboard(entry);
+          MG.ui.showScreen("loading");
+          MG.leaderboard.markBonus(entry, saved).then(function (ok) {
+            showLeaderboard(ok ? Object.assign({}, entry, { bonus: true }) : entry);
+          });
+        }
+      });
     });
   }
 

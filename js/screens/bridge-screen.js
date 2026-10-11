@@ -10,6 +10,11 @@ MG.screens = MG.screens || {};
 
   var FLASH_MS = 900;
 
+  function artUrl() { return "assets/bridge/" + MG.ui.variant().prefix + "glitch.webp"; }
+
+  /** Pictures to load before the screen is shown (both orientations, the phone may turn). */
+  function preloadUrls() { return ["assets/bridge/glitch.webp", "assets/bridge/m_glitch.webp", "assets/badges/repairman.webp"]; }
+
   function fill(text, name) { return text.split("[Имя]").join(name); }
 
   function safeUrl(raw) { return /^https?:\/\//i.test(raw) ? raw : ""; }
@@ -47,6 +52,14 @@ MG.screens = MG.screens || {};
     var flash = root.querySelector(".bridge-flash");
     var plate = root.querySelector(".bridge-plate");
     var done = false;
+    var stopWatching = null;
+    var art = root.querySelector(".bridge-bg");
+    function applyArt() {
+      art.style.backgroundImage = "url(\"" + artUrl() + "\")";
+      if (stopWatching) stopWatching();
+      stopWatching = MG.ui.watchVariant(MG.ui.variant().portrait, applyArt);
+    }
+    applyArt();
     plate.classList.remove("alert", "ok");
     plate.classList.add("alert");
     root.querySelector("label[for=bridge-code]").textContent = story.codeLabel;
@@ -54,6 +67,7 @@ MG.screens = MG.screens || {};
     function finish(bonus) {
       if (done) return;
       done = true;
+      if (stopWatching) stopWatching();
       opts.onDone({ bonus: bonus });
     }
 
@@ -159,5 +173,5 @@ MG.screens = MG.screens || {};
     showAlert();
   }
 
-  MG.screens.bridge = { run: run };
+  MG.screens.bridge = { run: run, preloadUrls: preloadUrls };
 })(window.MG);

@@ -242,11 +242,11 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rust); outl
 
 /* ---------- bridge to Skill'Ум: system failure, the archetype's request, code word ---------- */
 #screen-bridge { overflow: hidden; background: #050202; }
-.bridge-bg { position: absolute; inset: 0; background: url("../assets/sandbox/bg1.webp") center / cover no-repeat; filter: saturate(.6) brightness(.5) hue-rotate(-25deg); animation: bridge-jitter 2.6s steps(1) infinite; }
+.bridge-bg { position: absolute; inset: 0; background: url("../assets/sandbox/bg1.webp") center / cover no-repeat; animation: bridge-jitter 2.6s steps(1) infinite; }
 .bridge-bg::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .35) 0 2px, transparent 2px 4px); }
 @keyframes bridge-jitter {
   0%, 100% { transform: none; } 7% { transform: translate(-6px, 2px) skewX(-1.5deg); } 9% { transform: translate(5px, -3px); }
-  52% { transform: none; filter: saturate(.6) brightness(.8) hue-rotate(-25deg); } 54% { transform: translate(8px, 0) skewX(2deg); } 56% { transform: none; }
+  52% { transform: none; filter: brightness(1.25) saturate(1.2); } 54% { transform: translate(8px, 0) skewX(2deg); } 56% { transform: none; }
 }
 .bridge-flash { position: absolute; inset: 0; z-index: 4; background: #fff; opacity: 0; pointer-events: none; }
 .bridge-flash.on { animation: bridge-flash .9s ease-out; }
@@ -269,7 +269,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--rust); outl
 .bridge-error { margin: 0; color: var(--danger); font-size: 15px; }
 .bridge-actions { flex: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 14px; }
 a.btn { text-decoration: none; }
-.lb-bonus { margin-left: 6px; filter: sepia(1) saturate(4) hue-rotate(-10deg) brightness(1.2); }
+.lb-bonus { margin-left: 8px; width: 22px; height: 22px; vertical-align: -5px; border-radius: 50%; }
 
 /* ---------- goose heckler in the Sandbox (every third miss) ---------- */
 .goose-heckle { --gw: min(56vw, 330px); position: absolute; left: 0; right: 0; bottom: 0; z-index: 45; display: flex; flex-direction: column; align-items: flex-start; pointer-events: none; transform: translateX(-110%); opacity: 0; transition: transform .45s cubic-bezier(.175, .885, .32, 1.275), opacity .25s ease; }
