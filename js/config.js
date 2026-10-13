@@ -15,7 +15,7 @@
 window.MG = window.MG || {};
 window.MG.config = {
   firebaseDatabaseUrl: "https://cyber-village-default-rtdb.asia-southeast1.firebasedatabase.app",
-  skilumUrl: "", // public link to the Skill'Ум trainer; empty = the bridge screen is skipped
+  skilumUrl: "https://test.edtech-rtk.ru/p/733fdb5e20ac2924c9070d48a2d2fdde85a3b4c892e3bdc48ef8d6340f947ed5", // public link to the Skill'Ум trainer; empty = the bridge screen is skipped
   bridgeWordHash: "12mxmo2ldul", // MG.engine.hashBridgeWord of the code word shown at the end of the trainer
   leaderboardSize: 10,
   sceneSeconds: 45,
