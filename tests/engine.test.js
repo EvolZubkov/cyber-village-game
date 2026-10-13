@@ -159,3 +159,16 @@ test("bridge word matches only its own hash", () => {
 test("the hash stored in config.js stays the hash of the agreed word", () => {
   assert.equal(E.hashBridgeWord("ИЗОЛЕНТА"), "12mxmo2ldul");
 });
+
+test("trainer link carries the encoded name and the archetype", () => {
+  const base = "https://example.com/p/abc";
+  assert.equal(E.buildTrainerUrl(base, "Тест", "robonya"), base + "?name=%D0%A2%D0%B5%D1%81%D1%82&archetype=robonya");
+  assert.equal(E.buildTrainerUrl(base + "?x=1", "A&B", "cabbage"), base + "?x=1&name=A%26B&archetype=cabbage");
+  assert.equal(E.buildTrainerUrl(base + "#top", "Ян", ""), base + "?name=%D0%AF%D0%BD#top");
+});
+
+test("trainer link leaves out empty values and keeps an empty base empty", () => {
+  assert.equal(E.buildTrainerUrl("https://example.com/p/abc", "  ", ""), "https://example.com/p/abc");
+  assert.equal(E.buildTrainerUrl("", "Тест", "robonya"), "");
+  assert.equal(E.buildTrainerUrl(undefined, "Тест", "robonya"), "");
+});

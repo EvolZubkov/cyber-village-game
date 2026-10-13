@@ -97,6 +97,23 @@
   }
 
   /**
+   * The trainer link with the player's data: `?name=<name>&archetype=<id>`. Empty or missing values are left out,
+   * an existing query string of the base is kept; an empty base stays empty (the bridge is then skipped).
+   */
+  function buildTrainerUrl(base, name, archetype) {
+    if (typeof base !== "string" || base === "") return "";
+    var parts = [];
+    var cleaned = cleanName(name);
+    if (cleaned) parts.push("name=" + encodeURIComponent(cleaned));
+    if (typeof archetype === "string" && archetype !== "") parts.push("archetype=" + encodeURIComponent(archetype));
+    if (parts.length === 0) return base;
+    var hash = base.indexOf("#");
+    var head = hash === -1 ? base : base.slice(0, hash);
+    var tail = hash === -1 ? "" : base.slice(hash);
+    return head + (head.indexOf("?") === -1 ? "?" : "&") + parts.join("&") + tail;
+  }
+
+  /**
    * Phrases in random order without repeats: every phrase is shown once before any comes again,
    * and the first phrase of a new round never equals the last one of the previous round.
    * @param {string[]} phrases
@@ -127,7 +144,8 @@
     HEROES: HEROES, OUTCOMES: OUTCOMES, FINAL_KEYS: FINAL_KEYS, MAX_NAME_LENGTH: MAX_NAME_LENGTH,
     SCENES_TOTAL: SCENES_TOTAL, createState: createState, resolveOutcome: resolveOutcome,
     applyOutcome: applyOutcome, determineFinal: determineFinal, formatTime: formatTime, cleanName: cleanName, createPhraseBag: createPhraseBag,
-    normalizeBridgeWord: normalizeBridgeWord, hashBridgeWord: hashBridgeWord, bridgeWordMatches: bridgeWordMatches
+    normalizeBridgeWord: normalizeBridgeWord, hashBridgeWord: hashBridgeWord, bridgeWordMatches: bridgeWordMatches,
+    buildTrainerUrl: buildTrainerUrl
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;
