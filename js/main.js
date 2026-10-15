@@ -73,13 +73,39 @@
     });
   }
 
+  var RESUME_KEY = "mars-census-resume";
+  var RESUME_MAX_AGE_MS = 6 * 3600 * 1000;
+
+  /** Remembers the finished run while the player is in the trainer, so "back to the game" can reopen the code screen. */
+  function rememberRun(entry, saved) {
+    try { localStorage.setItem(RESUME_KEY, JSON.stringify({ entry: entry, saved: saved, at: Date.now() })); } catch (e) { /* no storage: no resume */ }
+  }
+
+  function forgetRun() {
+    try { localStorage.removeItem(RESUME_KEY); } catch (e) { /* nothing to forget */ }
+  }
+
+  /** The run remembered by rememberRun, or null when it is missing, stale or damaged. */
+  function recallRun() {
+    try {
+      var data = JSON.parse(localStorage.getItem(RESUME_KEY) || "null");
+      var entry = data && MG.leaderboard.validEntry(data.entry);
+      if (!entry || !(Date.now() - Number(data.at) < RESUME_MAX_AGE_MS)) return null;
+      return { entry: entry, saved: data.saved && typeof data.saved === "object" ? data.saved : null };
+    } catch (e) {
+      return null;
+    }
+  }
+
   /** Bridge to Skill'Ум: a correct code word gives the saved result the repairman badge before the table opens. */
-  function showBridge(entry, saved) {
+  function showBridge(entry, saved, startAt) {
     patch({ currentScene: "bridge" });
+    rememberRun(entry, saved);
     afterLoading(MG.screens.bridge.preloadUrls(), function () {
       MG.screens.bridge.run({
-        name: entry.name, archetype: entry.archetype, url: MG.config.skilumUrl, wordHash: MG.config.bridgeWordHash,
+        name: entry.name, archetype: entry.archetype, url: MG.config.skilumUrl, wordHash: MG.config.bridgeWordHash, startAt: startAt,
         onDone: function (result) {
+          forgetRun();
           if (!result.bonus) return showLeaderboard(entry);
           MG.ui.showScreen("loading");
           MG.leaderboard.markBonus(entry, saved).then(function (ok) {
@@ -99,6 +125,10 @@
     var q = MG.ui.query();
     if (q.clearboard) MG.leaderboard.clearLocal(); // ?clearboard=1 empties the table kept on this device
     if (q.final && MG.engine.FINAL_KEYS.indexOf(q.final) !== -1) return showFinal(q.final);
+    if (q.resume === "bridge" && MG.config.skilumUrl) {
+      var run = recallRun();
+      if (run) return showBridge(run.entry, run.saved, "code"); // back from the trainer: straight to the code word
+    }
     if (q.sandbox) return startSandbox("Тестер", q.type || "nikolay");
     if (q.scene && /^[123]$/.test(q.scene)) return playScene(Number(q.scene));
     startGame();

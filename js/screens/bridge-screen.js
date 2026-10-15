@@ -229,7 +229,8 @@ MG.screens = MG.screens || {};
     }
 
     form.onsubmit = function (e) { e.preventDefault(); submitCode(); };
-    showAlert();
+    if (opts.startAt === "code" && url) showCode();
+    else showAlert();
   }
 
   MG.screens.bridge = { run: run, preloadUrls: preloadUrls };
