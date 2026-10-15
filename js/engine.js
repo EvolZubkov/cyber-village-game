@@ -96,21 +96,25 @@
     return text !== "" && typeof hash === "string" && hash !== "" && hashBridgeWord(text) === hash;
   }
 
+  var DEMO_IDS = ["skilum", "botapp"];
+  var MAX_CONTACT_LENGTH = 120;
+
   /**
-   * The trainer link with the player's data: `?name=<name>&archetype=<id>`. Empty or missing values are left out,
-   * an existing query string of the base is kept; an empty base stays empty (the bridge is then skipped).
+   * A demo-day sign-up: who to invite (free text: name, e-mail, messenger) and which demos they want.
+   * Returns { contact, skilum, botapp } or null when the contact is empty or no demo is chosen.
    */
-  function buildTrainerUrl(base, name, archetype) {
-    if (typeof base !== "string" || base === "") return "";
-    var parts = [];
-    var cleaned = cleanName(name);
-    if (cleaned) parts.push("name=" + encodeURIComponent(cleaned));
-    if (typeof archetype === "string" && archetype !== "") parts.push("archetype=" + encodeURIComponent(archetype));
-    if (parts.length === 0) return base;
-    var hash = base.indexOf("#");
-    var head = hash === -1 ? base : base.slice(0, hash);
-    var tail = hash === -1 ? "" : base.slice(hash);
-    return head + (head.indexOf("?") === -1 ? "?" : "&") + parts.join("&") + tail;
+  function cleanSignup(raw) {
+    if (!raw || typeof raw !== "object") return null;
+    var contact = typeof raw.contact === "string"
+      ? raw.contact.replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, MAX_CONTACT_LENGTH) : "";
+    var chosen = Array.isArray(raw.demos) ? raw.demos : [];
+    var clean = { contact: contact };
+    var any = false;
+    DEMO_IDS.forEach(function (id) {
+      clean[id] = chosen.indexOf(id) !== -1;
+      any = any || clean[id];
+    });
+    return contact && any ? clean : null;
   }
 
   /**
@@ -145,7 +149,7 @@
     SCENES_TOTAL: SCENES_TOTAL, createState: createState, resolveOutcome: resolveOutcome,
     applyOutcome: applyOutcome, determineFinal: determineFinal, formatTime: formatTime, cleanName: cleanName, createPhraseBag: createPhraseBag,
     normalizeBridgeWord: normalizeBridgeWord, hashBridgeWord: hashBridgeWord, bridgeWordMatches: bridgeWordMatches,
-    buildTrainerUrl: buildTrainerUrl
+    cleanSignup: cleanSignup, DEMO_IDS: DEMO_IDS, MAX_CONTACT_LENGTH: MAX_CONTACT_LENGTH
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

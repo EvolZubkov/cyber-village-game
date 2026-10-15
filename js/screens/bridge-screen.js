@@ -93,8 +93,8 @@ MG.screens = MG.screens || {};
     function openLink() {
       var link = MG.ui.el("a", "btn", story.openButton);
       link.href = url;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
+      link.target = "skilum-trainer";
+      // No noopener on purpose: the trainer's "back to the game" button uses window.opener to return to this tab.
       link.addEventListener("click", function () { setTimeout(showCode, 0); });
       return link;
     }
@@ -131,7 +131,7 @@ MG.screens = MG.screens || {};
         scroll.appendChild(link);
         return setActions(phoneButtons());
       }
-      setActions([openLink(), button(story.skipButton, function () { finish(false); })]);
+      setActions([openLink()]);
     }
 
     function showCode() {
@@ -159,7 +159,66 @@ MG.screens = MG.screens || {};
         flash.classList.add("on");
         setTimeout(function () { flash.classList.remove("on"); }, FLASH_MS);
       }
-      setActions([button(story.boardButton, function () { finish(true); })]);
+      setActions([button(story.demoButton, showDemoForm), button(story.boardButton, function () { finish(true); })]);
+    }
+
+    /** Check boxes with the demos the player wants and one free-text contact line. */
+    function demoField(id, label) {
+      var row = MG.ui.el("label", "bridge-check");
+      var box = MG.ui.el("input");
+      box.type = "checkbox";
+      box.value = id;
+      row.appendChild(box);
+      row.appendChild(MG.ui.el("span", "", label));
+      return row;
+    }
+
+    function showDemoForm() {
+      removeExtras();
+      form.hidden = true;
+      title.textContent = story.demoTitle;
+      text.textContent = story.demoText;
+      var box = MG.ui.el("form", "bridge-extra bridge-demo");
+      box.autocomplete = "off";
+      Object.keys(story.demos).forEach(function (id) { box.appendChild(demoField(id, story.demos[id])); });
+      var who = MG.ui.el("label", "", story.demoContactLabel);
+      var contact = MG.ui.el("input");
+      contact.type = "text";
+      contact.maxLength = MG.engine.MAX_CONTACT_LENGTH;
+      contact.placeholder = story.demoContactHint;
+      contact.setAttribute("aria-label", story.demoContactLabel);
+      who.appendChild(contact);
+      var problem = MG.ui.el("p", "bridge-error");
+      problem.hidden = true;
+      box.appendChild(who);
+      box.appendChild(problem);
+      scroll.appendChild(box);
+
+      function submitDemo() {
+        var chosen = Array.prototype.filter.call(box.querySelectorAll("input[type=checkbox]"), function (c) { return c.checked; })
+          .map(function (c) { return c.value; });
+        var signup = { contact: contact.value, demos: chosen };
+        if (!MG.engine.cleanSignup(signup)) {
+          problem.textContent = chosen.length ? story.demoNoContact : story.demoNoChoice;
+          problem.hidden = false;
+          return;
+        }
+        problem.hidden = true;
+        send.disabled = true;
+        MG.signups.submit(signup, { name: opts.name, archetype: opts.archetype }).then(function () {
+          removeExtras();
+          text.textContent = fill(story.demoThanks, name);
+          setActions([button(story.boardButton, function () { finish(true); })]);
+        }, function () {
+          send.disabled = false;
+          problem.textContent = story.demoFailed;
+          problem.hidden = false;
+        });
+      }
+
+      var send = button(story.demoSend, submitDemo);
+      box.onsubmit = function (e) { e.preventDefault(); submitDemo(); };
+      setActions([send, button(story.demoBack, showSuccess)]);
     }
 
     function submitCode() {

@@ -78,7 +78,7 @@
     patch({ currentScene: "bridge" });
     afterLoading(MG.screens.bridge.preloadUrls(), function () {
       MG.screens.bridge.run({
-        name: entry.name, archetype: entry.archetype, url: MG.engine.buildTrainerUrl(MG.config.skilumUrl, entry.name, entry.archetype), wordHash: MG.config.bridgeWordHash,
+        name: entry.name, archetype: entry.archetype, url: MG.config.skilumUrl, wordHash: MG.config.bridgeWordHash,
         onDone: function (result) {
           if (!result.bonus) return showLeaderboard(entry);
           MG.ui.showScreen("loading");
